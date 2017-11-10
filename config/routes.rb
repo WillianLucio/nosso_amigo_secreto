@@ -12,4 +12,3 @@ Rails.application.routes.draw do
   get 'members/:token/opened', to: 'members#opened'
   resources :members, only: [:create, :destroy, :update]
 end
-view raw
