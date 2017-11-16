@@ -2,7 +2,7 @@ class MembersController < ApplicationController
   before_action :authenticate_user!, except: [:opened]
 
   before_action :set_member, only: [:show, :destroy, :update]
-  before_action :is_owner?, only: [:destroy, :update]
+  before_action :is_owner?, only: [:create, :destroy, :update]
   before_action :set_member_by_token, only: [:opened]
 
   def create
