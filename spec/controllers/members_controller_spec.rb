@@ -36,10 +36,10 @@ RSpec.describe MembersController, type: :controller do
         expect(response).to have_http_status(:success)
       end
   
-      # it "return the status 422 when member is already present" do
-      #   post :create, params: {member: @member.attributes}
-      #   expect(response).to have_http_status(:unprocessable_entity)
-      # end
+      it "return the status 422 when member is already present" do
+        post :create, params: {member: @member.attributes}
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     it "the user not owns campaign" do
