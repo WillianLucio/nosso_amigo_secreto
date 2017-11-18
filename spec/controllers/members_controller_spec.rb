@@ -52,16 +52,69 @@ RSpec.describe MembersController, type: :controller do
   end
 
   describe "GET #destroy" do
-    it "returns http success" do
-      # get :destroy
-      # expect(response).to have_http_status(:success)
+    context "member exists" do
+      context "have permission" do
+        before(:each) do
+          @campaign = create(:campaign, user: @current_user)
+          @member = create(:member, campaign: @campaign)
+          @before_count_member = Member.all.size
+
+          delete :destroy, params: {id: @member.id}
+        end
+
+        it "member was withdrawn from campaign" do
+          expect(@campaign.reload.members).to_not include(@member)
+        end
+
+        it "member has been deleted" do
+          expect(@before_count_member).to_not eql(Member.all.size)
+        end
+
+        it "return status 200 when it successful" do
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      context "don't have permission" do
+        it "return 403 when the user is not allowed" do
+          @campaign = create(:campaign)
+          @member = create(:member, campaign: @campaign)
+          
+          delete :destroy, params: { id: @member.id }
+          
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
     end
+
+    it "return 404 when did not find member" do
+      delete :destroy, params: { id: 9999}
+      expect(response).to have_http_status(302)
+    end
+    
+
+    
+
+
+      #======TESTES======
+      # O membro foi removido da campanha?
+      # O membro foi apagado
+      # O método retornou status 200 quando teve sucesso?
+      # O método retornou 404 quando não encontrou o membro para remover naquela equipe?
+      # O método retornou 403 quando o usuário não tem permissão de remover aquele membro?
   end
+
+  
 
   describe "GET #update" do
     it "returns http success" do
       # get :update
       # expect(response).to have_http_status(:success)
+
+      #======TESTES======
+      # O membro foi atualizado com sucesso?
+      # O método retornou status 200 quando teve sucesso?
+      # O método devolveu o status 422 quando o email atualizado já foi adicionado?
     end
   end
 
