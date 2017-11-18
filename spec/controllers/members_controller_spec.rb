@@ -87,35 +87,46 @@ RSpec.describe MembersController, type: :controller do
       end
     end
 
-    it "return 404 when did not find member" do
+    it "return 302 when did not find member" do
       delete :destroy, params: { id: 9999}
       expect(response).to have_http_status(302)
     end
-    
-
-    
-
-
-      #======TESTES======
-      # O membro foi removido da campanha?
-      # O membro foi apagado
-      # O método retornou status 200 quando teve sucesso?
-      # O método retornou 404 quando não encontrou o membro para remover naquela equipe?
-      # O método retornou 403 quando o usuário não tem permissão de remover aquele membro?
   end
-
-  
 
   describe "GET #update" do
-    it "returns http success" do
-      # get :update
-      # expect(response).to have_http_status(:success)
+    context "member is owner" do
+      before(:each) do
+        @campaign = create(:campaign, user: @current_user)
+        member = create(:member, campaign: @campaign)
 
-      #======TESTES======
-      # O membro foi atualizado com sucesso?
-      # O método retornou status 200 quando teve sucesso?
-      # O método devolveu o status 422 quando o email atualizado já foi adicionado?
+        @member_attributes = attributes_for(:member)
+        put :update, params: { id: member.id, member: @member_attributes }
+      end
+
+      it "the member has been updated" do
+        expect(Member.last).to have_attributes(@member_attributes)
+      end
+
+      it "return status 200 when has successful" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "return status 422 when update email has already been added" do
+        member = create(:member, campaign: @campaign)
+        put :update, params: { id: member.id, member: @member_attributes }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    it "user not owns campaign" do
+      campaign = create(:campaign)
+      member = create(:member, campaign: campaign)
+
+      member_attributes = attributes_for(:member)
+      put :update, params: { id: member.id, member: member_attributes }
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
-
 end
