@@ -3,16 +3,17 @@ class CampaignRaffleJob < ApplicationJob
 
   def perform(campaign)
     results = RaffleService.new(campaign).call
+    results = false
 
-    campaign.members.each {|m| m.set_pixel}
-    results.each do |r|
-      CampaignMailer.raffle(campaign, r.first, r.last).deliver_now
+    if results == false
+      CampaignMailer.error_raffle(campaign).deliver_now
+    elsif
+      campaign.members.each {|m| m.set_pixel}
+      results.each do |r|
+        CampaignMailer.raffle(campaign, r.first, r.last).deliver_now
+      end
+
+      campaign.update(status: :finished)
     end
-    campaign.update(status: :finished)
-
-
-    #if results == false
-      # Send mail to owner of campaign (desafio)
-    #end
   end
 end
